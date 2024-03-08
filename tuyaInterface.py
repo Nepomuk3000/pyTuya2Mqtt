@@ -19,7 +19,6 @@ class tuyaInterface:
     def start(self):
 
         for key, device in DevicesData.data.items():
-            print(device)
             thread = threading.Thread(target=self.poll,args=(device["desc"],))
             self.threads.append(thread)
             thread.start()
@@ -66,3 +65,4 @@ class tuyaInterface:
         finally:
             print("---- Exception -----")
             print(DevicesData.data)
+            print("--------------------")
