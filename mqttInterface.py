@@ -84,10 +84,10 @@ class mqttInterface:
                 device = DevicesData[id]
                 device['date'] = dateStr
                 message = json.dumps(device,indent=2)
-                topic = f"tuya/{device['desc']['name']}"
+                topic = f"tuya/{device['desc']['name']}/stat"
                 self.client.publish(topic, message)
                 DevicesData.save()
-            time.sleep(1)
+            time.sleep(5)
 
     # Callback appelée lorsqu'un message est reçu du broker
     def on_message(self, client, userdata, msg):
