@@ -17,7 +17,7 @@ class mqttInterface:
         # Paramètres du broker MQTT
         broker_address = "192.168.1.107"
         broker_port = 1883
-        self.topic = "tuya/cmd/#"
+        self.topic = "tuya/+/cmd"
         # Ouvrir le fichier JSON en mode lecture
         path = os.path.dirname(os.path.abspath(__file__))
         with open(path + '/config/credentials.json', 'r') as fichier:
@@ -91,7 +91,14 @@ class mqttInterface:
 
     # Callback appelée lorsqu'un message est reçu du broker
     def on_message(self, client, userdata, msg):
-        print("Message reveived... what to do ?")
-        print(client)
-        print(userdata)
-        print(msg)
+        topic = msg.topic
+        payload = msg.payload.decode('utf-8')
+        # TODO rendre ça générique
+        if (topic == "tuya/Compteur Garage/cmd"):
+            if payload == "on" or payload == "off":
+                id = DevicesData.getIdFromName("Compteur Garage")
+                DevicesData.setCommand(id,"switch",payload=="on")
+            else:
+                print (f"Payload {payload} is not supported for topic {topic}")
+        else:
+            print (f"Topic {topic} is not supported")

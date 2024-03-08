@@ -7,6 +7,7 @@ class DevicesDataClass:
     data = {}
     lastCommandDate = datetime.now()
     path = os.path.dirname(os.path.abspath(__file__))
+    _observers = []
 
     def __new__(cls):
         if cls.instance is None:
@@ -20,6 +21,10 @@ class DevicesDataClass:
     def __setitem__(self, key, value):
         self.data[key] = value
     
+    def setCommand(self, id, type, value):
+        self.data[id]['commands'][type] = value
+        self.notify_observers(id)
+
     def updateLastCommandDate(self):
         self.lastCommandDate = datetime.now()
 
@@ -40,9 +45,27 @@ class DevicesDataClass:
             self.data[data[0]["id"]] = {}
             self.data[data[0]["id"]]["desc"] = data[0]
             self.data[data[0]["id"]]["status"] = {}
+            self.data[data[0]["id"]]["commands"] = {}
         
     def save(self):
         with open(self.path + '/config/snapshot.json', 'w') as jsonfile:
             json.dump(DevicesData.data, jsonfile, indent=2)
-        
+            
+    def getIdFromName(self, name):
+        for id, device in self.data.items():
+            if device['desc']['name'] == name:
+                return id
+        return -1
+    
+    def add_observer(self, observer):
+        self._observers.append(observer)
+
+    def remove_observer(self, observer):
+        self._observers.remove(observer)
+
+    def notify_observers(self,id):
+        for observer in self._observers:
+            observer.onCommandReceived(id,self.data[id]['commands'])
+
+# Exemple d'utilisation
 DevicesData = DevicesDataClass()
