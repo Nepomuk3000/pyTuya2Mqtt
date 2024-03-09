@@ -48,7 +48,7 @@ class mqttInterface:
             name = device['desc']['name']
             mac = device['desc']['mac']
             model = device['desc']['model']
-            
+            version = device['desc']['version']
         
             data = {
                 'name': name,
@@ -63,7 +63,7 @@ class mqttInterface:
                     'name': name,
                     'manufacturer': 'TBD',
                     'model': model,
-                    'sw_version': 'tinytuya 3.4',
+                    'sw_version': f'tinytuya {version}',
                 }
             }
 

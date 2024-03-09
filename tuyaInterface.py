@@ -42,13 +42,19 @@ class tuyaInterface:
 
         logger.debug('Connecting to %s', device['ip'])
 
-        tuyaDevice = tinytuya.OutletDevice(device['id'], device['ip'], device['key'])
-        tuyaDevice.set_version(3.4)
-        tuyaDevice.set_socketPersistent(True)
-        self.tuyaDevices[device['id']] = tuyaDevice
-
         try:
-            while True:
+            tuyaDevice = tinytuya.OutletDevice(device['id'], device['ip'], device['key'])
+            tuyaDevice.set_version(device['version'])
+            tuyaDevice.set_socketPersistent(True)
+            self.tuyaDevices[device['id']] = tuyaDevice
+            status = ""
+        except Exception as e:
+            print("======== Exception 1 ========")
+            print(e)
+            return
+
+        while True:
+            try:
                 status = tuyaDevice.status()
                 for cle, valeur in status['dps'].items():
                     if cle in device['mapping']:
@@ -65,12 +71,18 @@ class tuyaInterface:
                     else:
                         DevicesData[device["id"]]["status"][cle] = valeur
                 try: 
-                    logger.debug('STATUS:  %s', status)
+                    print(f'STATUS:  {status}')
                 except:
                     continue
+            except Exception as e:
+                print("======== Exception 2 ========")
+                print(tuyaDevice)
+                print("------ Device -------")
+                print(device)
+                print("------ Status -------")
+                print(status)
+                print("------ DevicesData -------")
+                print(DevicesData.data)
+                print("===========================")
                         
-                time.sleep(TIME_SLEEP)
-        finally:
-            print("---- Exception -----")
-            print(DevicesData.data)
-            print("--------------------")
+            time.sleep(TIME_SLEEP)

@@ -42,10 +42,11 @@ class DevicesDataClass:
         with open(self.path + '/config/devices.json', 'r') as jsonfile:
             data = json.load(jsonfile)
             self.data = {}
-            self.data[data[0]["id"]] = {}
-            self.data[data[0]["id"]]["desc"] = data[0]
-            self.data[data[0]["id"]]["status"] = {}
-            self.data[data[0]["id"]]["commands"] = {}
+            for desc in data:
+                self.data[desc["id"]] = {}
+                self.data[desc["id"]]["desc"] = desc
+                self.data[desc["id"]]["status"] = {}
+                self.data[desc["id"]]["commands"] = {}
         
     def save(self):
         with open(self.path + '/config/snapshot.json', 'w') as jsonfile:
