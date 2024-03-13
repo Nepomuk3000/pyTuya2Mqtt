@@ -43,10 +43,17 @@ class DevicesDataClass:
             data = json.load(jsonfile)
             self.data = {}
             for desc in data:
-                self.data[desc["id"]] = {}
-                self.data[desc["id"]]["desc"] = desc
-                self.data[desc["id"]]["status"] = {}
-                self.data[desc["id"]]["commands"] = {}
+                id = desc["id"]
+                self.data[id] = {}
+                self.data[id]["desc"] = desc
+                self.data[id]["status"] = {}
+                self.data[id]["commands"] = {}
+                switchCommandId = None
+                for key, value in desc["mapping"].items():
+                    if "code" in value and (value["code"] == "switch" or value["code"] == "switch_1"):
+                        switchCommandId = key
+                        break
+                self.data[id]["desc"]["switchCommandId"]=switchCommandId
         
     def save(self):
         with open(self.path + '/config/snapshot.json', 'w') as jsonfile:
@@ -56,7 +63,7 @@ class DevicesDataClass:
         for id, device in self.data.items():
             if device['desc']['name'] == name:
                 return id
-        return -1
+        return null
     
     def add_observer(self, observer):
         self._observers.append(observer)

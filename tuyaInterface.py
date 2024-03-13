@@ -27,9 +27,11 @@ class tuyaInterface:
     def onCommandReceived(self,id,command):
         logger.info (f"Send {command} to {id} : {self.tuyaDevices[id]}")
         ret = None
+        switchCommandId = DevicesData[id]["desc"]["switchCommandId"]
         if (command["switch"] == True):
-            self.tuyaDevices[id].turn_on()
+            ret = self.tuyaDevices[id].set_value(switchCommandId, True)
         elif (command["switch"] == False):
+            ret = self.tuyaDevices[id].set_value(switchCommandId, False)
         logger.info (f"Command {command} to {id} returns {ret}")
         
     def poll(self, device ):
@@ -44,7 +46,7 @@ class tuyaInterface:
 
         try:
             tuyaDevice = tinytuya.OutletDevice(device['id'], device['ip'], device['key'])
-            tuyaDevice.set_version(device['version'])
+            tuyaDevice.set_version(float(device['version']))
             tuyaDevice.set_socketPersistent(True)
             self.tuyaDevices[device['id']] = tuyaDevice
             status = ""

@@ -87,18 +87,23 @@ class mqttInterface:
                 message = json.dumps(device,indent=2)
                 topic = f"tuya/{device['desc']['name']}/stat"
                 self.client.publish(topic, message)
-                DevicesData.save()
+                # DevicesData.save()
             time.sleep(5)
 
     # Callback appelée lorsqu'un message est reçu du broker
     def on_message(self, client, userdata, msg):
         topic = msg.topic
         payload = msg.payload.decode('utf-8')
-        # TODO rendre ça générique
-        if (topic == "tuya/Compteur Garage/cmd"):
-            if payload == "on" or payload == "off":
-                id = DevicesData.getIdFromName("Compteur Garage")
-                DevicesData.setCommand(id,"switch",payload=="on")
+        logger.info(f"MQTT message received. Topic = {topic} - Payload = {payload}")
+        topicParts = topic.split('/')
+        if len(topicParts) != 3:
+            logger.error(f"Err : Received topic {topic} format is not supported")
+            return
+        deviceName = topic.split('/')[1]
+        if payload == "true" or payload == "false":
+            id = DevicesData.getIdFromName(deviceName)
+            if (id):
+                DevicesData.setCommand(id,"switch",payload=="true")
             else:
                 logger.error (f"Err : Unable to process topic {topic}")
         else:
