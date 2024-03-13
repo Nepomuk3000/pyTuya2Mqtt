@@ -9,6 +9,7 @@ import time
 from datetime import datetime
 import os
 from devicesData import DevicesData
+from logger import logger
 
 class mqttInterface:
     
@@ -99,6 +100,6 @@ class mqttInterface:
                 id = DevicesData.getIdFromName("Compteur Garage")
                 DevicesData.setCommand(id,"switch",payload=="on")
             else:
-                print (f"Payload {payload} is not supported for topic {topic}")
+                logger.error (f"Err : Unable to process topic {topic}")
         else:
-            print (f"Topic {topic} is not supported")
+            logger.error (f"Err : Payload {payload} is not supported for topic {topic}")

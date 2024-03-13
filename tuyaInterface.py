@@ -3,12 +3,10 @@ import json
 import threading
 import time
 import tinytuya
-import logging
 from devicesData import DevicesData
+from logger import logger
 
-logger = logging.getLogger(__name__)
 TIME_SLEEP = 5
-
 
 class tuyaInterface:
     tuyaDevices = {}
@@ -27,10 +25,12 @@ class tuyaInterface:
             threadPoll.start()
             
     def onCommandReceived(self,id,command):
+        logger.info (f"Send {command} to {id} : {self.tuyaDevices[id]}")
+        ret = None
         if (command["switch"] == True):
             self.tuyaDevices[id].turn_on()
         elif (command["switch"] == False):
-            self.tuyaDevices[id].turn_off()
+        logger.info (f"Command {command} to {id} returns {ret}")
         
     def poll(self, device ):
         '''
@@ -40,7 +40,7 @@ class tuyaInterface:
             device:  An instance of Device dataclass
         '''
 
-        logger.debug('Connecting to %s', device['ip'])
+        logger.info('Connecting to %s', device['ip'])
 
         try:
             tuyaDevice = tinytuya.OutletDevice(device['id'], device['ip'], device['key'])
@@ -49,8 +49,8 @@ class tuyaInterface:
             self.tuyaDevices[device['id']] = tuyaDevice
             status = ""
         except Exception as e:
-            print("======== Exception 1 ========")
-            print(e)
+            logger.error("======== Exception 1 ========")
+            logger.error(e)
             return
 
         while True:
@@ -71,18 +71,18 @@ class tuyaInterface:
                     else:
                         DevicesData[device["id"]]["status"][cle] = valeur
                 try: 
-                    print(f'STATUS:  {status}')
+                    logger.debug(f'STATUS for {device["id"]} :  {status}')
                 except:
                     continue
             except Exception as e:
-                print("======== Exception 2 ========")
-                print(tuyaDevice)
-                print("------ Device -------")
-                print(device)
-                print("------ Status -------")
-                print(status)
-                print("------ DevicesData -------")
-                print(DevicesData.data)
-                print("===========================")
+                logger.error("======== Exception 2 ========")
+                logger.error(tuyaDevice)
+                logger.error("------ Device -------")
+                logger.error(device)
+                logger.error("------ Status -------")
+                logger.error(status)
+                logger.error("------ DevicesData -------")
+                logger.error(DevicesData.data)
+                logger.error("===========================")
                         
             time.sleep(TIME_SLEEP)
